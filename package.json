@@ -1,0 +1,14 @@
+{
+  "name": "allo-product-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for Allo.ua product information",
+  "main": "scraper.js",
+  "scripts": {
+    "start": "node scraper.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "fs": "^0.0.1-security"
+  }
+}
