@@ -1,9 +1,15 @@
+require('dotenv').config() // Завантажує змінні з .env
 const TelegramBot = require('node-telegram-bot-api')
 const axios = require('axios')
 const cheerio = require('cheerio')
 
-// Токен вашого бота
-const token = '7959868199:AAHu4WdIcdU-aye3xaSrvyORQkwvimKgdec'
+// Отримуємо токен бота зі змінних середовища
+const token = process.env.TELEGRAM_BOT_TOKEN
+if (!token) {
+	console.error('Токен бота не знайдено. Перевірте файл .env')
+	process.exit(1)
+}
+
 const bot = new TelegramBot(token, { polling: true })
 
 // Функція для очищення та форматування ціни
