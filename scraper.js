@@ -91,18 +91,25 @@ bot.onText(/\/product (.+)/, async (msg, match) => {
 
 	const productInfo = await getProductInfo(productId)
 	if (productInfo) {
-		let message = `Назва: ${productInfo.title}\n`
-		if (productInfo.oldPrice)
-			message += `Стара ціна: ${productInfo.oldPrice} ₴\n`
-		message += `Нова ціна: ${productInfo.newPrice} ₴\n`
-		if (productInfo.creditPrice)
-			message += `Ціна в кредит: ${productInfo.creditPrice} ₴\n`
-		if (productInfo.installments)
-			message += `Кількість платежів: ${productInfo.installments}\n`
-		message += `Посилання: ${productInfo.productUrl}`
+		// Формуємо об'єкт з даними
+		const productData = {
+			Назва: productInfo.title,
+			Стара_ціна: productInfo.oldPrice ? `${productInfo.oldPrice} ₴` : 'Немає',
+			Нова_ціна: productInfo.newPrice ? `${productInfo.newPrice} ₴` : 'Немає',
+			Ціна_в_кредит: productInfo.creditPrice
+				? `${productInfo.creditPrice} ₴`
+				: 'Немає',
+			Кількість_платежів: productInfo.installments || 'Немає',
+			Посилання: productInfo.productUrl,
+		}
 
-		bot.sendMessage(chatId, message)
-		if (productInfo.image) bot.sendPhoto(chatId, productInfo.image)
+		// Відправляємо об'єкт у вигляді JSON
+		bot.sendMessage(chatId, JSON.stringify(productData, null, 2))
+
+		// Відправляємо зображення, якщо воно є
+		if (productInfo.image) {
+			bot.sendPhoto(chatId, productInfo.image)
+		}
 	} else {
 		bot.sendMessage(
 			chatId,
