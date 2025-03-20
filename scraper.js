@@ -99,7 +99,7 @@ bot.onText(/\/product (.+)/, async (msg, match) => {
 			Ціна_в_кредит: productInfo.creditPrice
 				? `${productInfo.creditPrice} ₴`
 				: 'Немає',
-			Кількість_платежів: productInfo.installments || 'Немає',
+			Кількість_платежів_: productInfo.installments || 'Немає',
 			Посилання: productInfo.productUrl,
 		}
 
