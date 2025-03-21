@@ -49,21 +49,21 @@ async function getProductInfo(productId) {
 		const $$ = cheerio.load(productResponse.data)
 
 		const title = cleanTitle($$('.p-view__header-title').text().trim())
+		const image = $$('.main-gallery__link img').attr('src')
 		const oldPrice = cleanPrice($$('.p-trade-price__old > .sum').text().trim())
 		const newPrice = cleanPrice(
 			$$('.p-trade-price__current > .sum').text().trim()
 		)
 		const creditPrice = cleanPrice($$('.p-credit-button__price').text().trim())
-		const image = $$('.main-gallery__link img').attr('src')
 		const installments = calculateInstallments(newPrice, creditPrice)
 
 		return {
 			title,
+			image,
 			oldPrice,
 			newPrice,
 			creditPrice,
 			installments,
-			image,
 			productUrl: firstProductLink,
 		}
 	} catch (error) {
@@ -91,25 +91,22 @@ bot.onText(/\/product (.+)/, async (msg, match) => {
 
 	const productInfo = await getProductInfo(productId)
 	if (productInfo) {
-		// Формуємо об'єкт з даними
-		const productData = {
-			Назва: productInfo.title,
-			Стара_ціна: productInfo.oldPrice ? `${productInfo.oldPrice} ₴` : 'Немає',
-			Нова_ціна: productInfo.newPrice ? `${productInfo.newPrice} ₴` : 'Немає',
-			Ціна_в_кредит: productInfo.creditPrice
-				? `${productInfo.creditPrice} ₴`
-				: 'Немає',
-			Кількість_платежів_: productInfo.installments || 'Немає',
-			Посилання: productInfo.productUrl,
+		// Формуємо текст для відправки
+		const message = `
+Назва: ${productInfo.title}
+Посилання: ${productInfo.productUrl}
+Картинка: ${productInfo.image}
+Стара ціна: ${productInfo.oldPrice ? `${productInfo.oldPrice}` : 'Немає'}
+Нова ціна: ${productInfo.newPrice ? `${productInfo.newPrice}` : 'Немає'}
+Ціна в кредит: ${
+			productInfo.creditPrice ? `${productInfo.creditPrice}` : 'Немає'
 		}
+Кількість платежів: ${productInfo.installments || 'Немає'}
 
-		// Відправляємо об'єкт у вигляді JSON
-		bot.sendMessage(chatId, JSON.stringify(productData, null, 2))
+        `
 
-		// Відправляємо зображення, якщо воно є
-		if (productInfo.image) {
-			bot.sendPhoto(chatId, productInfo.image)
-		}
+		// Відправляємо повідомлення
+		bot.sendMessage(chatId, message.trim())
 	} else {
 		bot.sendMessage(
 			chatId,
